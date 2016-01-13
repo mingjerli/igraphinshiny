@@ -9,3 +9,4 @@ Depends: shiny, igraph
 Description: Use Shiny to control igraph to make learning graph theory easily.
 License: GPL (>= 2)
 LazyData: TRUE
+KeepSource: TRUE
