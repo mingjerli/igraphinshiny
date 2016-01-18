@@ -3,8 +3,9 @@ Type: Package
 Title: Use Shiny to Demo igraph
 Version: 0.1
 Date: 2016-01-12
-Author: person("Ming-Jer", "Lee", email="mingjerli@gmail.com")
-Maintainer: Ming-Jer Lee <mingjerli@gmail.com>
+Authors@R: person("Ming-Jer", "Lee", email = "mingjerli@gmail.com",
+                  role = c("aut", "cre"))
+Depends: R (>= 3.2.0)
 Imports:
     shiny,
     igraph
