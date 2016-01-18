@@ -1,12 +1,12 @@
 Package: igraphinshiny
 Type: Package
-Title: Use Shiny to Demo igraph plot
+Title: Use Shiny to Demo igraph
 Version: 0.1
 Date: 2016-01-12
 Author: Ming-Jer Lee
 Maintainer: Ming-Jer Lee <mingjerli@gmail.com>
 Depends: shiny, igraph
-Description: Use Shiny to control igraph to make learning graph theory easily.
+Description: Using Shiny to demo igraph package makes learning graph theory easy and fun.
 License: GPL (>= 2)
 LazyData: TRUE
 KeepSource: TRUE
