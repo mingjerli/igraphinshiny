@@ -14,6 +14,8 @@ This is why I create this shiny app to demonstrate the plot function in igraph. 
 
 The goal of `igraphinshiny` is to help people without knowledge of graph theory or R can easily learn graph theory.
 
+[This app is also hosted on shinyapps.io](https://mlee2.shinyapps.io/igraph/)
+
 ## Installation
 `devtools::install_github('mingjerli/igraphinshiny')`
 
