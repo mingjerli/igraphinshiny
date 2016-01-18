@@ -9,5 +9,5 @@ Run igraph plot demo in shiny
 }
 \examples{
 ## Not run:
-#igraphinshiny()
+#plotDemo()
 }

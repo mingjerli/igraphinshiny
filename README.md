@@ -23,7 +23,7 @@ The goal of `igraphinshiny` is to help people without knowledge of graph theory 
 `library(igraphinshiny)`
 
 ## How to use
-`runExample()`
+`plotDemo()`
 
 ## Contributors
 
@@ -31,4 +31,4 @@ Ming-Jer Lee (mingjerli@gmail.com )
 
 ## License
 
-Apache 2
+GPL (>=2)
