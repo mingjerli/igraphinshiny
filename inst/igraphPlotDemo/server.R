@@ -1,9 +1,8 @@
+## I still keep load these two package for stand alone shiny apps
 library(shiny)
 library(igraph)
-#library(readxl)
 
 shinyServer(function(input, output) {
-
   output$GraphTypeUI <- renderUI({
     if (is.null(input$GraphType))
       return()

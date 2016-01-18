@@ -1,8 +1,8 @@
-\name{igraphinshiny}
-\alias{igraphinshiny}
+\name{plotDemo}
+\alias{plotDemo}
 \title{Run igraph plot demo in shiny}
 \usage{
-igraphinshiny()
+plotDemo()
 }
 \description{
 Run igraph plot demo in shiny
