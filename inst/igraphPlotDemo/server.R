@@ -51,6 +51,8 @@ shinyServer(function(input, output) {
   realTimeGraph <- reactive({
     if (is.null(input$GraphType))
       return()
+
+    # Assign graph according graph type
     g <- switch(input$GraphType,
                 "Full Graph" = graph.full(n=input$nNode, directed=input$isDirected, loops=input$isLoops),
                 "Empty Graph" = graph.empty(n=input$nNode, directed=input$isDirected),
@@ -61,12 +63,13 @@ shinyServer(function(input, output) {
                 "Erdos-Renyi" = erdos.renyi.game(n=input$nNode, p=input$pNode, directed=input$isDirected, loops=input$isLoops),
                 "Watts-Strogatz" = watts.strogatz.game(dim=input$dimNode, size=input$sizeNode, nei=input$nei$Node, p=input$pNode, multiple=input$isMultiple, loops=input$isLoops),
                 "Barabasi-Albert" = barabasi.game(n=input$nNode, power=input$powerGraph, directed=input$isDirected),
-                "Adjacency Matrix" = graph.adjacency(as.matrix(read.csv(input$file1$datapath, header=input$header, sep=input$sep, quote=input$quote)))
+                "Adjacency Matrix" = graph_from_adjacency_matrix(as.matrix(read.csv(input$file1$datapath, header=input$header, sep=input$sep, quote=input$quote)), weighted=TRUE)
                 )
   })
 
   plotGraph <- function(){
     g <- realTimeGraph()
+    # Adjust graph layout
     plotlayout <- switch(input$PlotLayout,
                       "Auto"=layout.auto(g),
                       "Random"=layout.random(g),
@@ -82,29 +85,27 @@ shinyServer(function(input, output) {
                       "Graphopt"=layout.graphopt(g),
                       "SVD"=layout.svd(g)
                       )
+    # Show node name or not
     if(!input$showNodeName){
       V(g)$label = ""
     }
+    # Adjust vertex size according user input
     V(g)$size = input$vertexSize
-    plot(g, layout=plotlayout)
-  }
+    # Adjust arrow size according user input
+    E(g)$arrow.size = input$arrowSize/10
 
-  calculateCentrality <- function(){
-    Centralities <- list()
-    Centralities$Alpha <- as(alpha.centrality(realTimeGraph()),"matrix")
-    Centralities$Bon <- as(bonpow(realTimeGraph()),"matrix")
-    Centralities$Closeness <- as(closeness(realTimeGraph()),"matrix")
-    Centralities$Evcent <- as(evcent(realTimeGraph())$vector,"matrix")
-    Centralities$Kleinberg <- as(authority.score(realTimeGraph())$vector,"matrix")
-    Centralities$PageRank <- as(page.rank(realTimeGraph())$vector,"matrix")
-    Centralities$Betweenness <- as(betweenness(realTimeGraph()),"matrix")
-    return(as.data.frame(Centralities))
+    # Adjust edge width according weight (if the graph is weighted)
+    if( is.weighted(g)){
+      E(g)$width = 5 * E(g)$weight/max(E(g)$weight)
+    }
+    plot(g, layout=plotlayout)
   }
 
   output$graphPlot <- renderPlot({
     suppressWarnings(plotGraph())
   })
 
+  ## Download pdf
   output$downloadPlot <- downloadHandler(
     filename = function() {
       paste('NetworkGraph',format(Sys.time(),"%Y%m%d_%H%M%S"),'.pdf', sep='')
@@ -116,7 +117,20 @@ shinyServer(function(input, output) {
     }
   )
 
-  output$AdjMatrix <- renderTable(as(get.adjacency(realTimeGraph()),"matrix"))
+  ## Output of Adjacency Matrix Panel
+  output$AdjMatrix <- renderTable(as(as_adjacency_matrix(realTimeGraph(), attr='weight'),"matrix"))
 
+  ## Output of Centrality Panel
+  calculateCentrality <- function(){
+    Centralities <- list()
+    Centralities$Alpha <- as(alpha.centrality(realTimeGraph()),"matrix")
+    Centralities$Bon <- as(bonpow(realTimeGraph()),"matrix")
+    Centralities$Closeness <- as(closeness(realTimeGraph()),"matrix")
+    Centralities$Evcent <- as(evcent(realTimeGraph())$vector,"matrix")
+    Centralities$Kleinberg <- as(authority.score(realTimeGraph())$vector,"matrix")
+    Centralities$PageRank <- as(page.rank(realTimeGraph())$vector,"matrix")
+    Centralities$Betweenness <- as(betweenness(realTimeGraph()),"matrix")
+    return(as.data.frame(Centralities))
+  }
   output$Centralities <- renderTable(as(calculateCentrality(),"matrix"))
 })

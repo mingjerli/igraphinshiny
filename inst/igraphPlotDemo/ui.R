@@ -13,8 +13,8 @@ shiny::shinyUI(fluidPage(
                                 "Tree Graph",
                                 "Erdos-Renyi",
                                 "Watts-Strogatz",
-                                "Barabasi-Albert",
-                                "Adjacency Matrix"), selected="Full Graph")
+                                "Adjacency Matrix",
+                                "Barabasi-Albert"), selected="Full Graph")
         )),
         column(5, wellPanel(
           uiOutput("GraphTypeUI")
@@ -35,7 +35,8 @@ shiny::shinyUI(fluidPage(
                       )),
                       column(4, wellPanel(
                         checkboxInput(inputId = "showNodeName", label = "Show Vertex Label",  value = TRUE),
-                        sliderInput(inputId = "vertexSize", label = "Vertex Size",  value = 15, min=1, max=100)
+                        sliderInput(inputId = "vertexSize", label = "Vertex Size",  value = 15, min=1, max=100),
+                        sliderInput(inputId = "arrowSize", label = "Arrow Size",  value = 0, min=0, max=20)
                       )),
                       column(4, wellPanel(
                         downloadButton('downloadPlot', 'Download Plot in pdf')
