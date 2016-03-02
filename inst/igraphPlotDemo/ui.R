@@ -26,12 +26,22 @@ shiny::shinyUI(fluidPage(
                   tabPanel("Plot", wellPanel(
                     fluidRow(
                       column(12, wellPanel(
-                        plotOutput("graphPlot")
+                        plotOutput("graphPlot", height=450)
                       ))
                     ),
                     fluidRow(
                       column(4, wellPanel(
-                        radioButtons(inputId="PlotLayout", label="Plot Layout", choices=c("Auto","Random","Circle","Sphere","Fruchterman Reingold","Kamada Kawai","Drl","Spring","Reingold Tilford","Fruchterma Reingold Grid","Lgl","Graphout","SVD"), selected="Auto")
+                        radioButtons(inputId="PlotLayout", label="Plot Layout",
+                                     choices=c("Auto"
+                                               ,"Random"
+                                               ,"Circle"
+                                               ,"Sphere"
+                                               ,"Fruchterman Reingold"
+                                               ,"Kamada Kawai"
+                                               ,"Drl"
+                                               ,"Reingold Tilford"
+                                               ,"Lgl"
+                                               ,"Graphout"), selected="Auto")
                       )),
                       column(4, wellPanel(
                         checkboxInput(inputId = "showNodeName", label = "Show Vertex Label",  value = TRUE),

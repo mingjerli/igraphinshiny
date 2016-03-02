@@ -13,7 +13,13 @@ shinyServer(function(input, output) {
            "Empty Graph" = wellPanel(numericInput("nNode", "Number of vertices", value = 10, max=100),
                              checkboxInput("isDirected", "directed", value=TRUE)),
            "Star Graph" = wellPanel(numericInput("nNode", "Number of vertices", value = 10, max=100),
-                            selectInput(inputId="GraphMode", label="Graph Mode", choices=c("undirected","in","out","mutual"), selected="undirected")),
+                            selectInput(inputId = "GraphMode",
+                                        label = "Graph Mode",
+                                        choices = c("undirected"="undirected"
+                                                  ,"in"="in"
+                                                  ,"out"="out"
+                                                  ,"mutual"="mutual"),
+                                        selected = "mutual")),
            "Lattice Graph" = wellPanel(numericInput("dimGraph", "Dimension of Lattice", value = 2),
                                        numericInput("lengthGraph", "Length of Lattice", value = 5),
                                        checkboxInput("isDirected", "directed", value=FALSE),
@@ -50,21 +56,23 @@ shinyServer(function(input, output) {
 
   realTimeGraph <- reactive({
     if (is.null(input$GraphType))
-      return()
-
+      return(graph.empty())
+    cat(paste0('creating ', input$GraphType,'\n'))
     # Assign graph according graph type
     g <- switch(input$GraphType,
                 "Full Graph" = graph.full(n=input$nNode, directed=input$isDirected, loops=input$isLoops),
                 "Empty Graph" = graph.empty(n=input$nNode, directed=input$isDirected),
-                "Star Graph" = graph.star(n=input$nNode, mode=input$GraphMode),
+                "Star Graph" = make_star(n=input$nNode, mode=input$GraphMode),
                 "Lattice Graph" = graph.lattice(length = input$lengthGraph, dim = input$dimGraph, directed=input$isDirected, mutual=input$isMutual, circular=input$isCircular),
                 "Ring Graph" = graph.ring(n=input$nNode, directed=input$isDirected, mutual=input$isMutual, circular=input$isCircular),
-                "Tree Graph" = graph.tree(n=input$nNode, children=input$nChild, mode=input$GraphMode),
+                "Tree Graph" = make_tree(n=input$nNode, children=input$nChild, mode=input$GraphMode),
                 "Erdos-Renyi" = erdos.renyi.game(n=input$nNode, p=input$pNode, directed=input$isDirected, loops=input$isLoops),
                 "Watts-Strogatz" = watts.strogatz.game(dim=input$dimNode, size=input$sizeNode, nei=input$nei$Node, p=input$pNode, multiple=input$isMultiple, loops=input$isLoops),
                 "Barabasi-Albert" = barabasi.game(n=input$nNode, power=input$powerGraph, directed=input$isDirected),
                 "Adjacency Matrix" = graph_from_adjacency_matrix(as.matrix(read.csv(input$file1$datapath, header=input$header, sep=input$sep, quote=input$quote)), weighted=TRUE)
                 )
+    cat(paste0('returning ', input$GraphType,'\n'))
+    return(g)
   })
 
   plotGraph <- function(){
@@ -78,12 +86,9 @@ shinyServer(function(input, output) {
                       "Fruchterman Reingold"=layout.fruchterman.reingold(g),
                       "Kamada Kawai"=layout.kamada.kawai(g),
                       "Drl"=layout.drl(g),
-                      "Spring"=layout.spring(g),
                       "Reingold Tilford"=layout.reingold.tilford(g),
-                      "Fruchterma Reingold Grid"=layout.fruchterman.reingold.grid(g),
                       "Lgl"=layout.lgl(g),
-                      "Graphopt"=layout.graphopt(g),
-                      "SVD"=layout.svd(g)
+                      "Graphopt"=layout.graphopt(g)
                       )
     # Show node name or not
     if(!input$showNodeName){
@@ -98,10 +103,17 @@ shinyServer(function(input, output) {
     if( is.weighted(g)){
       E(g)$width = 5 * E(g)$weight/max(E(g)$weight)
     }
-    plot(g, layout=plotlayout)
+    print(vcount(g))
+    print(range(plotlayout[,1]))
+    print(range(plotlayout[,2]))
+
+    if(vcount(g) > 0){
+      plot(g, layout=plotlayout)
+    }
   }
 
   output$graphPlot <- renderPlot({
+    # plotGraph()
     suppressWarnings(plotGraph())
   })
 
@@ -118,7 +130,18 @@ shinyServer(function(input, output) {
   )
 
   ## Output of Adjacency Matrix Panel
-  output$AdjMatrix <- renderTable(as(as_adjacency_matrix(realTimeGraph(), attr='weight'),"matrix"))
+  calculateAdjMatrix <- function(){
+    g=realTimeGraph()
+    if(is.weighted(g)){
+      adjmat <- as(as_adjacency_matrix(g, attr='weight'),"matrix")
+    }else{
+      adjmat <- as(as_adjacency_matrix(g),"matrix")
+    }
+    return(adjmat)
+  }
+  output$AdjMatrix <- renderTable(calculateAdjMatrix())
+
+  # output$AdjMatrix <- renderTable(as(as_adjacency_matrix(realTimeGraph(), attr='weight'),"matrix"))
 
   ## Output of Centrality Panel
   calculateCentrality <- function(){
