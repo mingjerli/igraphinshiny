@@ -8,7 +8,8 @@ Authors@R: person("Ming-Jer", "Lee", email = "mingjerli@gmail.com",
 Depends: R (>= 3.2.0)
 Imports:
     shiny,
-    igraph
+    igraph,
+    readxl
 Description: Using 'shiny' to demo 'igraph' package makes learning graph theory easy and fun.
 License: GPL (>= 2)
 LazyData: TRUE

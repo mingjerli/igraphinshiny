@@ -14,6 +14,7 @@ shiny::shinyUI(fluidPage(
                                 "Erdos-Renyi",
                                 "Watts-Strogatz",
                                 "Adjacency Matrix",
+                                "Adjacency Matrix Excel",
                                 "Barabasi-Albert"), selected="Full Graph")
         )),
         column(5, wellPanel(

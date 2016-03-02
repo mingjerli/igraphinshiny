@@ -1,6 +1,7 @@
 ## I still keep load these two package for stand alone shiny apps
 library(shiny)
 library(igraph)
+library(readxl)
 
 shinyServer(function(input, output) {
   output$GraphTypeUI <- renderUI({
@@ -49,7 +50,7 @@ shinyServer(function(input, output) {
                                           checkboxInput('header', 'Header', TRUE),
                                           radioButtons('sep', 'Separator',c(Comma=',',Semicolon=';',Tab='\t'),','),
                                           radioButtons('quote', 'Quote',c(None='','Double Quote'='"','Single Quote'="'"),'"')),
-           "Adjacency Matrix Excel" = wellPanel(fileInput('file1', 'Choose xlsx File', accept=c('text/xlsx', 'text/comma-separated-values,text/plain', '.xlsx')),
+           "Adjacency Matrix Excel" = wellPanel(fileInput('file2', 'Choose xlsx File', accept=c('.xlsx')),
                                           checkboxInput('header', 'Header', TRUE))
           )
   })
@@ -58,6 +59,8 @@ shinyServer(function(input, output) {
     if (is.null(input$GraphType))
       return(graph.empty())
     cat(paste0('creating ', input$GraphType,'\n'))
+    if (input$GraphType == "Adjacency Matrix Excel" || input$GraphType == "Adjacency Matrix")
+      print(input$file1$datapath)
     # Assign graph according graph type
     g <- switch(input$GraphType,
                 "Full Graph" = graph.full(n=input$nNode, directed=input$isDirected, loops=input$isLoops),
@@ -69,7 +72,12 @@ shinyServer(function(input, output) {
                 "Erdos-Renyi" = erdos.renyi.game(n=input$nNode, p=input$pNode, directed=input$isDirected, loops=input$isLoops),
                 "Watts-Strogatz" = watts.strogatz.game(dim=input$dimNode, size=input$sizeNode, nei=input$nei$Node, p=input$pNode, multiple=input$isMultiple, loops=input$isLoops),
                 "Barabasi-Albert" = barabasi.game(n=input$nNode, power=input$powerGraph, directed=input$isDirected),
-                "Adjacency Matrix" = graph_from_adjacency_matrix(as.matrix(read.csv(input$file1$datapath, header=input$header, sep=input$sep, quote=input$quote)), weighted=TRUE)
+                "Adjacency Matrix" = graph_from_adjacency_matrix(as.matrix(read.csv(input$file1$datapath, header=input$header, sep=input$sep, quote=input$quote)), weighted=TRUE),
+                "Adjacency Matrix Excel" = {inFile <- input$file2;
+                                            if(is.null(inFile))
+                                              return(NULL)
+                                            file.rename(inFile$datapath, paste0(inFile$datapath, ".xlsx"))
+                                            graph_from_adjacency_matrix(as.matrix(readxl::read_excel(paste0(inFile$datapath, ".xlsx"), col_names = input$header)), weighted=TRUE)}
                 )
     cat(paste0('returning ', input$GraphType,'\n'))
     return(g)
@@ -94,8 +102,10 @@ shinyServer(function(input, output) {
     if(!input$showNodeName){
       V(g)$label = ""
     }
+
     # Adjust vertex size according user input
     V(g)$size = input$vertexSize
+
     # Adjust arrow size according user input
     E(g)$arrow.size = input$arrowSize/10
 
@@ -103,10 +113,8 @@ shinyServer(function(input, output) {
     if( is.weighted(g)){
       E(g)$width = 5 * E(g)$weight/max(E(g)$weight)
     }
-    print(vcount(g))
-    print(range(plotlayout[,1]))
-    print(range(plotlayout[,2]))
 
+    # To avoid plot without boundary error
     if(vcount(g) > 0){
       plot(g, layout=plotlayout)
     }
