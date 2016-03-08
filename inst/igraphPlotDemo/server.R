@@ -58,7 +58,7 @@ shinyServer(function(input, output) {
   realTimeGraph <- reactive({
     if (is.null(input$GraphType))
       return(graph.empty())
-    cat(paste0('creating ', input$GraphType,'\n'))
+    # cat(paste0('creating ', input$GraphType,'\n'))
     if (input$GraphType == "Adjacency Matrix Excel" || input$GraphType == "Adjacency Matrix")
       print(input$file1$datapath)
     # Assign graph according graph type
@@ -79,7 +79,7 @@ shinyServer(function(input, output) {
                                             file.rename(inFile$datapath, paste0(inFile$datapath, ".xlsx"))
                                             graph_from_adjacency_matrix(as.matrix(readxl::read_excel(paste0(inFile$datapath, ".xlsx"), col_names = input$header)), weighted=TRUE)}
                 )
-    cat(paste0('returning ', input$GraphType,'\n'))
+    # cat(paste0('returning ', input$GraphType,'\n'))
     return(g)
   })
 

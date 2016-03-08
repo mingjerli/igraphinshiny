@@ -1,28 +1,23 @@
 shiny::shinyUI(fluidPage(
   titlePanel("igraph plot demo"),
   fluidRow(
-    column(4, wellPanel(
-      fluidRow(
-        column(7, wellPanel(
-          selectInput(inputId="GraphType", label="Graph Type",
-                      choices=c("Full Graph",
-                                "Empty Graph",
-                                "Star Graph",
-                                "Lattice Graph",
-                                "Ring Graph",
-                                "Tree Graph",
-                                "Erdos-Renyi",
-                                "Watts-Strogatz",
-                                "Adjacency Matrix",
-                                "Adjacency Matrix Excel",
-                                "Barabasi-Albert"), selected="Full Graph")
-        )),
-        column(5, wellPanel(
-          uiOutput("GraphTypeUI")
-        ))
-      )
-    )),
-    column(8, wellPanel(
+    column(3, wellPanel(
+            selectInput(inputId="GraphType", label="Graph Type",
+                        choices=c("Full Graph",
+                                  "Empty Graph",
+                                  "Star Graph",
+                                  "Lattice Graph",
+                                  "Ring Graph",
+                                  "Tree Graph",
+                                  "Erdos-Renyi",
+                                  "Watts-Strogatz",
+                                  "Adjacency Matrix",
+                                  "Adjacency Matrix Excel",
+                                  "Barabasi-Albert"), selected="Full Graph"),
+                      uiOutput("GraphTypeUI")
+            )
+    ),
+    column(9, wellPanel(
       tabsetPanel(type="tabs",
                   tabPanel("Plot", wellPanel(
                     fluidRow(
