@@ -1,2 +1,9 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.github$
+^README\.md$
+^NEWS\.md$
+^test$
+^inst/igraphPlotDemo/rsconnect$
+^\.gitignore$
+^cran-comments\.md$

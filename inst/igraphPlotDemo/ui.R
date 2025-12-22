@@ -37,7 +37,7 @@ shiny::shinyUI(fluidPage(
                                                ,"Drl"
                                                ,"Reingold Tilford"
                                                ,"Lgl"
-                                               ,"Graphout"), selected="Auto")
+                                               ,"Graphopt"), selected="Auto")
                       )),
                       column(4, wellPanel(
                         checkboxInput(inputId = "showNodeName", label = "Show Vertex Label",  value = TRUE),

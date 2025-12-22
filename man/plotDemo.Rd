@@ -1,13 +1,20 @@
 \name{plotDemo}
 \alias{plotDemo}
-\title{Run igraph plot demo in shiny}
+\title{Run igraph Plot Demo in Shiny}
 \usage{
 plotDemo()
 }
 \description{
-Run igraph plot demo in shiny
+Launches an interactive Shiny web application that demonstrates igraph
+plotting functionality and graph theory concepts. Users can visualize
+various graph types, view adjacency matrices, and compute centrality measures.
+}
+\value{
+This function does not return a value. It launches a Shiny application
+in the user's default web browser.
 }
 \examples{
-## Not run:
-#plotDemo()
+\dontrun{
+plotDemo()
+}
 }

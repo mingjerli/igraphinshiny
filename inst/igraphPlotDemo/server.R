@@ -1,8 +1,3 @@
-## I still keep load these two package for stand alone shiny apps
-library(shiny)
-library(igraph)
-library(readxl)
-
 shinyServer(function(input, output) {
   output$GraphTypeUI <- renderUI({
     if (is.null(input$GraphType))
@@ -57,29 +52,27 @@ shinyServer(function(input, output) {
 
   realTimeGraph <- reactive({
     if (is.null(input$GraphType))
-      return(graph.empty())
-    # cat(paste0('creating ', input$GraphType,'\n'))
+      return(igraph::make_empty_graph())
     if (input$GraphType == "Adjacency Matrix Excel" || input$GraphType == "Adjacency Matrix")
       print(input$file1$datapath)
     # Assign graph according graph type
     g <- switch(input$GraphType,
-                "Full Graph" = graph.full(n=input$nNode, directed=input$isDirected, loops=input$isLoops),
-                "Empty Graph" = graph.empty(n=input$nNode, directed=input$isDirected),
-                "Star Graph" = make_star(n=input$nNode, mode=input$GraphMode),
-                "Lattice Graph" = graph.lattice(length = input$lengthGraph, dim = input$dimGraph, directed=input$isDirected, mutual=input$isMutual, circular=input$isCircular),
-                "Ring Graph" = graph.ring(n=input$nNode, directed=input$isDirected, mutual=input$isMutual, circular=input$isCircular),
-                "Tree Graph" = make_tree(n=input$nNode, children=input$nChild, mode=input$GraphMode),
-                "Erdos-Renyi" = erdos.renyi.game(n=input$nNode, p=input$pNode, directed=input$isDirected, loops=input$isLoops),
-                "Watts-Strogatz" = watts.strogatz.game(dim=input$dimNode, size=input$sizeNode, nei=input$nei$Node, p=input$pNode, multiple=input$isMultiple, loops=input$isLoops),
-                "Barabasi-Albert" = barabasi.game(n=input$nNode, power=input$powerGraph, directed=input$isDirected),
-                "Adjacency Matrix" = graph_from_adjacency_matrix(as.matrix(read.csv(input$file1$datapath, header=input$header, sep=input$sep, quote=input$quote)), weighted=TRUE),
+                "Full Graph" = igraph::make_full_graph(n=input$nNode, directed=input$isDirected, loops=input$isLoops),
+                "Empty Graph" = igraph::make_empty_graph(n=input$nNode, directed=input$isDirected),
+                "Star Graph" = igraph::make_star(n=input$nNode, mode=input$GraphMode),
+                "Lattice Graph" = igraph::make_lattice(length = input$lengthGraph, dim = input$dimGraph, directed=input$isDirected, mutual=input$isMutual, circular=input$isCircular),
+                "Ring Graph" = igraph::make_ring(n=input$nNode, directed=input$isDirected, mutual=input$isMutual, circular=input$isCircular),
+                "Tree Graph" = igraph::make_tree(n=input$nNode, children=input$nChild, mode=input$GraphMode),
+                "Erdos-Renyi" = igraph::sample_gnp(n=input$nNode, p=input$pNode, directed=input$isDirected, loops=input$isLoops),
+                "Watts-Strogatz" = igraph::sample_smallworld(dim=input$dimNode, size=input$sizeNode, nei=input$neiNode, p=input$pNode, multiple=input$isMultiple, loops=input$isLoops),
+                "Barabasi-Albert" = igraph::sample_pa(n=input$nNode, power=input$powerGraph, directed=input$isDirected),
+                "Adjacency Matrix" = igraph::graph_from_adjacency_matrix(as.matrix(read.csv(input$file1$datapath, header=input$header, sep=input$sep, quote=input$quote)), weighted=TRUE),
                 "Adjacency Matrix Excel" = {inFile <- input$file2;
                                             if(is.null(inFile))
                                               return(NULL)
                                             file.rename(inFile$datapath, paste0(inFile$datapath, ".xlsx"))
-                                            graph_from_adjacency_matrix(as.matrix(readxl::read_excel(paste0(inFile$datapath, ".xlsx"), col_names = input$header)), weighted=TRUE)}
+                                            igraph::graph_from_adjacency_matrix(as.matrix(readxl::read_excel(paste0(inFile$datapath, ".xlsx"), col_names = input$header)), weighted=TRUE)}
                 )
-    # cat(paste0('returning ', input$GraphType,'\n'))
     return(g)
   })
 
@@ -87,41 +80,40 @@ shinyServer(function(input, output) {
     g <- realTimeGraph()
     # Adjust graph layout
     plotlayout <- switch(input$PlotLayout,
-                      "Auto"=layout.auto(g),
-                      "Random"=layout.random(g),
-                      "Circle"=layout.circle(g),
-                      "Sphere"=layout.sphere(g),
-                      "Fruchterman Reingold"=layout.fruchterman.reingold(g),
-                      "Kamada Kawai"=layout.kamada.kawai(g),
-                      "Drl"=layout.drl(g),
-                      "Reingold Tilford"=layout.reingold.tilford(g),
-                      "Lgl"=layout.lgl(g),
-                      "Graphopt"=layout.graphopt(g)
+                      "Auto"=igraph::layout_nicely(g),
+                      "Random"=igraph::layout_randomly(g),
+                      "Circle"=igraph::layout_in_circle(g),
+                      "Sphere"=igraph::layout_on_sphere(g),
+                      "Fruchterman Reingold"=igraph::layout_with_fr(g),
+                      "Kamada Kawai"=igraph::layout_with_kk(g),
+                      "Drl"=igraph::layout_with_drl(g),
+                      "Reingold Tilford"=igraph::layout_as_tree(g),
+                      "Lgl"=igraph::layout_with_lgl(g),
+                      "Graphopt"=igraph::layout_with_graphopt(g)
                       )
     # Show node name or not
     if(!input$showNodeName){
-      V(g)$label = ""
+      igraph::V(g)$label = ""
     }
 
     # Adjust vertex size according user input
-    V(g)$size = input$vertexSize
+    igraph::V(g)$size = input$vertexSize
 
     # Adjust arrow size according user input
-    E(g)$arrow.size = input$arrowSize/10
+    igraph::E(g)$arrow.size = input$arrowSize/10
 
     # Adjust edge width according weight (if the graph is weighted)
-    if( is.weighted(g)){
-      E(g)$width = 5 * E(g)$weight/max(E(g)$weight)
+    if(igraph::is_weighted(g)){
+      igraph::E(g)$width = 5 * igraph::E(g)$weight/max(igraph::E(g)$weight)
     }
 
     # To avoid plot without boundary error
-    if(vcount(g) > 0){
+    if(igraph::vcount(g) > 0){
       plot(g, layout=plotlayout)
     }
   }
 
   output$graphPlot <- renderPlot({
-    # plotGraph()
     suppressWarnings(plotGraph())
   })
 
@@ -140,27 +132,25 @@ shinyServer(function(input, output) {
   ## Output of Adjacency Matrix Panel
   calculateAdjMatrix <- function(){
     g=realTimeGraph()
-    if(is.weighted(g)){
-      adjmat <- as(as_adjacency_matrix(g, attr='weight'),"matrix")
+    if(igraph::is_weighted(g)){
+      adjmat <- as(igraph::as_adjacency_matrix(g, attr='weight'),"matrix")
     }else{
-      adjmat <- as(as_adjacency_matrix(g),"matrix")
+      adjmat <- as(igraph::as_adjacency_matrix(g),"matrix")
     }
     return(adjmat)
   }
   output$AdjMatrix <- renderTable(calculateAdjMatrix())
 
-  # output$AdjMatrix <- renderTable(as(as_adjacency_matrix(realTimeGraph(), attr='weight'),"matrix"))
-
   ## Output of Centrality Panel
   calculateCentrality <- function(){
     Centralities <- list()
-    Centralities$Alpha <- as(alpha.centrality(realTimeGraph()),"matrix")
-    Centralities$Bon <- as(bonpow(realTimeGraph()),"matrix")
-    Centralities$Closeness <- as(closeness(realTimeGraph()),"matrix")
-    Centralities$Evcent <- as(evcent(realTimeGraph())$vector,"matrix")
-    Centralities$Kleinberg <- as(authority.score(realTimeGraph())$vector,"matrix")
-    Centralities$PageRank <- as(page.rank(realTimeGraph())$vector,"matrix")
-    Centralities$Betweenness <- as(betweenness(realTimeGraph()),"matrix")
+    Centralities$Alpha <- as(igraph::alpha_centrality(realTimeGraph()),"matrix")
+    Centralities$Power <- as(igraph::power_centrality(realTimeGraph()),"matrix")
+    Centralities$Closeness <- as(igraph::closeness(realTimeGraph()),"matrix")
+    Centralities$Eigenvector <- as(igraph::eigen_centrality(realTimeGraph())$vector,"matrix")
+    Centralities$Authority <- as(igraph::authority_score(realTimeGraph())$vector,"matrix")
+    Centralities$PageRank <- as(igraph::page_rank(realTimeGraph())$vector,"matrix")
+    Centralities$Betweenness <- as(igraph::betweenness(realTimeGraph()),"matrix")
     return(as.data.frame(Centralities))
   }
   output$Centralities <- renderTable(as(calculateCentrality(),"matrix"))

@@ -1,2 +1,4 @@
-exportPattern("^[[:alpha:]]+")
-import("igraph","shiny")
+export(plotDemo)
+import(shiny)
+import(igraph)
+importFrom(readxl, read_excel)

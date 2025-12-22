@@ -1,16 +1,24 @@
 Package: igraphinshiny
 Type: Package
 Title: Use 'shiny' to Demo 'igraph'
-Version: 0.1.1
-Date: 2016-01-20
+Version: 0.2.0
+Date: 2025-12-22
 Authors@R: person("Ming-Jer", "Lee", email = "mingjerli@gmail.com",
                   role = c("aut", "cre"))
-Depends: R (>= 3.2.0)
+Depends: R (>= 4.1.0)
 Imports:
     shiny,
     igraph,
     readxl
-Description: Using 'shiny' to demo 'igraph' package makes learning graph theory easy and fun.
+Description: Provides an interactive 'shiny' web application for demonstrating
+    'igraph' plotting functionality and graph theory concepts. Users can
+    visualize various graph types including random graphs, lattices, trees,
+    and scale-free networks. The application also computes and displays
+    adjacency matrices and various centrality measures such as betweenness,
+    closeness, and PageRank. Supports importing custom graphs from CSV and
+    Excel files.
 License: GPL (>= 2)
+Encoding: UTF-8
+URL: https://github.com/mingjerli/igraphinshiny
+BugReports: https://github.com/mingjerli/igraphinshiny/issues
 LazyData: TRUE
-KeepSource: TRUE
